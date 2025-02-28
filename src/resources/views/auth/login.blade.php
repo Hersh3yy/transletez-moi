@@ -19,7 +19,7 @@
 
         <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
 
-        <form method="POST" onsubmit="handleSubmit(event)">
+        <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
@@ -46,46 +46,4 @@
         </form>
     </div>
 </div>
-
-<script>
-async function handleSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
-    const errorDiv = document.getElementById('error-message');
-    
-    try {
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-            },
-            body: JSON.stringify({
-                email: form.email.value,
-                password: form.password.value
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Store the token in local storage
-            if (data.authorisation && data.authorisation.token) {
-                localStorage.setItem('jwt_token', data.authorisation.token);
-            }
-            // Redirect to the welcome page
-            window.location.href = '/';
-        } else {
-            // Handle errors
-            errorDiv.textContent = data.message || 'Login failed';
-            errorDiv.classList.remove('hidden');
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        errorDiv.textContent = 'An error occurred during login';
-        errorDiv.classList.remove('hidden');
-    }
-}
-</script>
 @endsection 

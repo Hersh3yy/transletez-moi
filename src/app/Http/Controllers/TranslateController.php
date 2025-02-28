@@ -17,7 +17,7 @@ class TranslateController extends Controller
     public function translate(Request $request, string $target_language)
     {
         $request->validate([
-            'json_data' => 'nullable|array',
+            'json_data' => 'nullable|string',
             'file' => 'nullable|file|mimes:json',
         ]);
 
@@ -32,7 +32,10 @@ class TranslateController extends Controller
         if ($request->hasFile('file')) {
             $jsonData = json_decode(file_get_contents($request->file('file')->getRealPath()), true);
         } else {
-            $jsonData = $request->input('json_data', []);
+            $jsonData = $request->input('json_data', null);
+            if ($jsonData) {
+                $jsonData = json_decode($jsonData, true);
+            }
         }
 
         if (empty($jsonData) || !is_array($jsonData)) {
@@ -50,8 +53,7 @@ class TranslateController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Translation failed',
-                'message' => $e->getMessage()
+                'error' => 'Translation failed: ' . $e->getMessage()
             ], 500);
         }
     }

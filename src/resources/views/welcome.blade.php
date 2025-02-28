@@ -41,7 +41,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="result" class="block text-sm font-medium text-gray-700">Translation Result</label>
-                    <textarea id="result" name="result" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50" placeholder="Translation will appear here..."></textarea>
+                    <textarea id="result" name="result" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50" placeholder="Translation will appear here..." disabled></textarea>
                 </div>
                 <div id="error-message" class="mb-4 text-red-500 hidden"></div>
                 <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Translate</button>
@@ -52,6 +52,21 @@
                     
                     const form = event.target;
                     const formData = new FormData(form);
+                    const jsonData = formData.get('json_data');
+
+                    // Encode the JSON data if it's not empty
+                    if (jsonData) {
+                        try {
+                            // Validate JSON format
+                            JSON.parse(jsonData); // This will throw an error if the JSON is invalid
+                        } catch (e) {
+                            const errorDiv = document.getElementById('error-message');
+                            errorDiv.textContent = 'Invalid JSON data provided.';
+                            errorDiv.classList.remove('hidden');
+                            return;
+                        }
+                    }
+
                     const targetLang = formData.get('target_language');
                     const errorDiv = document.getElementById('error-message');
                     const resultArea = document.getElementById('result');
