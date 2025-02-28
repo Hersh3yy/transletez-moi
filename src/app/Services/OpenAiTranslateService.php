@@ -26,7 +26,7 @@ class OpenAiTranslateService
      */
     public function isLanguageSupported(string $language): bool
     {
-        return isset($this->supportedLanguages[$language]) || 
+        return isset($this->supportedLanguages[strtolower($language)]) || 
                in_array(strtolower($language), array_map('strtolower', $this->supportedLanguages));
     }
 

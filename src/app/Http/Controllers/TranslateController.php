@@ -17,8 +17,7 @@ class TranslateController extends Controller
     public function translate(Request $request, string $target_language)
     {
         $request->validate([
-            'json_data' => 'nullable|string',
-            'file' => 'nullable|file|mimes:json',
+            'json_data' => 'required',
         ]);
 
         $targetLanguage = strtolower($target_language);
@@ -29,12 +28,24 @@ class TranslateController extends Controller
             ], 422);
         }
 
-        if ($request->hasFile('file')) {
-            $jsonData = json_decode(file_get_contents($request->file('file')->getRealPath()), true);
+        // Get json_data input
+        $jsonInput = $request->input('json_data');
+
+        // Handle different input formats
+        if (is_array($jsonInput)) {
+            // Already an array (from API client)
+            $jsonData = $jsonInput;
         } else {
-            $jsonData = $request->input('json_data', null);
-            if ($jsonData) {
-                $jsonData = json_decode($jsonData, true);
+            // Try to decode if it's a string (from web form)
+            $jsonData = json_decode($jsonInput, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'The json data field must be valid JSON.',
+                    'errors' => [
+                        'json_data' => ['The json data field must be valid JSON.']
+                    ]
+                ], 422);
             }
         }
 
@@ -50,7 +61,6 @@ class TranslateController extends Controller
             return response()->json([
                 'data' => $translatedData
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Translation failed: ' . $e->getMessage()

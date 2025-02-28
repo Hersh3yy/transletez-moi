@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TranslateController;
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -15,7 +16,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         $target_language = 'en'; // Default language is english
-        return view('welcome', compact('target_language'));
+        return view('frontend', compact('target_language'));
     });
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Add translation endpoint for web session authentication
+    Route::post('/translate/{target_language}', [TranslateController::class, 'translate']);
 });
