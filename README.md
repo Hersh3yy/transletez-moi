@@ -16,7 +16,7 @@ An API that leverages OpenAI's API to translate a user provided json file of phr
 
 1. Clone this repository.
 
-2. Create environment files:
+2. Create environment file:
 ```bash
 # Laravel directory
 cp src/.env.example src/.env
@@ -44,17 +44,11 @@ docker compose run --rm api php artisan jwt:secret
 6. Start the application:
 ```bash
 docker compose up -d
-```
-
-7. Setup database with seed data (optional):
-```bash
-docker compose run --rm api php artisan migrate:fresh --seed
-```
 
 ## API Endpoints
 
 ### Core Endpoints
-- `GET /api/translate` - List all workouts
+- `GET /api/translate` - Translate a JSON object
 
 - `GET /docs/api` - API Documentation UI
 - `GET /telescope` - Development debugging dashboard
@@ -63,9 +57,9 @@ docker compose run --rm api php artisan migrate:fresh --seed
 
 Create a workout:
 ```bash
-curl -X POST http://localhost:8000/api/workouts \
+curl -X POST http://localhost:8000/api/translate \
   -H "Content-Type: application/json" \
-  -d '{"description": "Did 3 sets of bench press: 100kg for 5 reps, 110kg for 3, 120kg for 1"}'
+  -d '{"workouts.excercise.benchpress": "Benchpress"}'
 ```
 
 
