@@ -1,11 +1,9 @@
 # Transletez-moi
-
-An API that leverages OpenAI's API to translate a user provided json file of phrases to a target language of choice.
+An API that leverages OpenAI's API to translate a user provided json or json file of phrases to a target language of choice.
 
 ## Tech Stack
-
-- PHP 8.3
-- Laravel 12
+- PHP 8.4
+- Laravel 11
 - PostgreSQL
 - Docker & Docker Compose
 - OpenAI GPT
@@ -13,15 +11,12 @@ An API that leverages OpenAI's API to translate a user provided json file of phr
 - Scramble for API documentation
 
 ## Run Locally with Docker
-
 1. Clone this repository.
-
 2. Create environment file:
 ```bash
 # Laravel directory
 cp src/.env.example src/.env
 ```
-
 3. Update src/.env with required settings:
 ```env
 
@@ -44,6 +39,9 @@ docker compose run --rm api php artisan jwt:secret
 6. Start the application:
 ```bash
 docker compose up -d
+```
+
+Note: If the use of docker is not desired, change the DB_CONNECTION environment variable to sqlite to not depend on the postgreSQL container for data storage.
 
 ## API Endpoints
 
@@ -52,15 +50,6 @@ docker compose up -d
 
 - `GET /docs/api` - API Documentation UI
 - `GET /telescope` - Development debugging dashboard
-
-### Example Usage
-
-Create a workout:
-```bash
-curl -X POST http://localhost:8000/api/translate \
-  -H "Content-Type: application/json" \
-  -d '{"workouts.excercise.benchpress": "Benchpress"}'
-```
 
 
 ## Testing
@@ -83,14 +72,6 @@ docker compose exec api php artisan test
    # In src/.env
    OPENAI_API_KEY=your_api_key_here
    OPENAI_ORGANIZATION=org-... # Optional
-   ```
-
-3. Verify installation:
-   ```bash
-   # Create a workout to test OpenAI integration
-   curl -X POST http://localhost:8000/api/workouts \
-     -H "Content-Type: application/json" \
-     -d '{"description": "3 sets bench press: 60kg 5 reps"}'
    ```
 
 Note: The free tier of OpenAI API has rate limits and usage quotas. Monitor your usage on the OpenAI dashboard to avoid unexpected charges.

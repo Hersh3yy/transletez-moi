@@ -8,8 +8,16 @@
     </head>
     <body class="font-sans antialiased bg-gray-100">
         <div class="container mx-auto p-6">
-            <h1 class="text-2xl font-bold mb-4">Translate JSON Data</h1>
-            <form action="/api/translate" method="POST" enctype="multipart/form-data">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold">Translate JSON Data</h1>
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Logout
+                    </button>
+                </form>
+            </div>
+            <form id="translateForm" onsubmit="handleSubmit(event)">
                 @csrf
                 <div class="mb-4">
                     <label for="json_data" class="block text-sm font-medium text-gray-700">JSON Data (paste JSON here)</label>
@@ -31,8 +39,65 @@
                         <option value="pt">Portuguese</option>
                     </select>
                 </div>
+                <div class="mb-4">
+                    <label for="result" class="block text-sm font-medium text-gray-700">Translation Result</label>
+                    <textarea id="result" name="result" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-opacity-50" placeholder="Translation will appear here..."></textarea>
+                </div>
+                <div id="error-message" class="mb-4 text-red-500 hidden"></div>
                 <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Translate</button>
             </form>
+            <script>
+                async function handleSubmit(event) {
+                    event.preventDefault();
+                    
+                    const form = event.target;
+                    const formData = new FormData(form);
+                    const targetLang = formData.get('target_language');
+                    const errorDiv = document.getElementById('error-message');
+                    const resultArea = document.getElementById('result');
+                    
+                    // Retrieve the token from local storage
+                    const token = localStorage.getItem('jwt_token'); // Ensure this matches the token you set during login
+
+                    if (!token) {
+                        errorDiv.textContent = 'You are not logged in. Please log in first.';
+                        errorDiv.classList.remove('hidden');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/api/translate/${targetLang}`, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'Accept': 'application/json',
+                                'Authorization': `Bearer ${token}`, // Send the token here
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value // Include CSRF token for web routes
+                            }
+                        });
+
+                        if (response.status === 401) {
+                            // Redirect to login if unauthorized
+                            window.location.href = '/login';
+                            return;
+                        }
+
+                        const data = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Translation failed');
+                        }
+
+                        resultArea.value = JSON.stringify(data, null, 2);
+                        errorDiv.classList.add('hidden');
+                        errorDiv.textContent = '';
+                    } catch (error) {
+                        errorDiv.classList.remove('hidden');
+                        errorDiv.textContent = error.message;
+                        resultArea.value = '';
+                    }
+                }
+            </script>
         </div>
     </body>
 </html>

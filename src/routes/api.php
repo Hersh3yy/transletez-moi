@@ -1,14 +1,14 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TranslateController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TranslateController;
+use App\Http\Controllers\AuthController;
 
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
+// Public API routes
+Route::post('/login', [AuthController::class, 'apiLogin']);
+Route::post('/register', [AuthController::class, 'apiRegister']);
 
+// Protected API routes
 Route::middleware('auth:api')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('refresh', [AuthController::class, 'refresh']);
-    Route::post('translate/{target_language}', [TranslateController::class, 'translate']);
+    Route::post('/translate/{target_language}', [TranslateController::class, 'translate']);
 });
